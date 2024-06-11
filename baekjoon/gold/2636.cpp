@@ -8,7 +8,18 @@ bool in_range(int x,int y,int n,int m)
     if (x>=0 && x<=n && y>=0 && y<=m) return 1;
     return 0;
 }
-int bfs(vector<vector<int> > &v, vector<vector<int> > &ck)
+bool ck_cheese(vector<vector<int>> v)
+{
+    for(auto i : v)
+    {
+        for(auto j : i)
+        {
+            if(j==1) return 1;
+        }
+    }
+    return 0;
+}
+int bfs(vector<vector<int> > &v, vector<vector<int> > &ck,int time)
 {
     int x,y;
     x=y=0;
@@ -20,9 +31,12 @@ int bfs(vector<vector<int> > &v, vector<vector<int> > &ck)
         x=q.front().first;
         y=q.front().second;
         q.pop();
-
     }
-    return 0; 
+    if(ck_cheese(v))
+    {
+           
+    }
+    return time; 
 }
 int main()
 {

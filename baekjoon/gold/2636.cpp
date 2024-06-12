@@ -19,7 +19,7 @@ bool ck_cheese(vector<vector<int>> v)
     }
     return 0;
 }
-int bfs(vector<vector<int> > &v, vector<vector<int> > &ck,int time)
+int bfs(vector<vector<int> > &v, vector<vector<int> > &ck,int &time)
 {
     int x,y;
     x=y=0;
@@ -32,11 +32,7 @@ int bfs(vector<vector<int> > &v, vector<vector<int> > &ck,int time)
         y=q.front().second;
         q.pop();
     }
-    if(ck_cheese(v))
-    {
-           
-    }
-    return time; 
+    time++;
 }
 int main()
 {
@@ -52,6 +48,16 @@ int main()
         {
             cin>> v[i][j];
         }
+    }
+    while(1)
+    {
+        int t=0;
+        if(ck_cheese(v))
+        {
+            cout<< t;
+            break;
+        }
+        dfs(v,ck,t);
     }
     cout<< bfs(v,ck);
 }

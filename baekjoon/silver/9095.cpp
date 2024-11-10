@@ -13,10 +13,10 @@ int main()
         v.push_back(n);
     }
     max= *std::max_element(v.begin(),v.end());
-    dp.assign(max,0);
+    dp.assign(max,-1);
     for(int i=0; i<max; i++)
     {
-
+        
     }
     return 0;
 }

